@@ -1,65 +1,69 @@
 # worldcup-analyzer
 
-2026 美加墨世界杯深度分析 Claude Code Skill。为中文球迷设计，一个老球迷赛前该问的 5 件事，每次都问全。
+2026 美加墨世界杯深度分析 Agent Skill。为中文球迷设计，世界杯球迷赛事分析，不靠印象分析，靠结构分析。
 
 ## 功能
 
-通过 `/worldcup-analyzer` 斜杠命令触发，支持 4 种分析模式：
+通过 `/worldcup-analyzer` 斜杠命令触发，支持 6 种分析模式：
 
-| 模式 | 触发方式 | 输出 |
+| 模式 | 触发条件 | 输出 |
 |------|----------|------|
+| 赛事前瞻 | 赛事未开始（< 06-11） | 分组概况 / 大名单 / 出线前景 / 核心球员 / 历史底蕴 |
 | 赛前 | 有未踢比赛 | 五件套：赛事概览 / 双方首发 / 战术推演 / H2H / 典故 |
 | 赛后 | 比赛已结束 | 五件套：比赛回顾 / 事件链 / 战术评估 / 亮点 / 展望 |
+| 赛事总结 | 赛事已结束（> 07-19） | 完整战绩 / 关键比赛 / 核心球员 / 历史意义 |
 | 球员 | 含球员名 | 球队模式 + 球员聚焦段 |
 | 历史 | 未参赛球队 | 历届记录表 + 经典比赛回顾 |
 
+路由入口设有**阶段零**（赛事窗口检查），根据当前日期自动分流到前瞻、进行中或总结模式。赛事进行中阶段执行搜索验证和正常路由分发。
+
 ## 安装
 
-```bash
-# 克隆仓库
-git clone <repo-url> worldcup-analyzer
-cd worldcup-analyzer
+以下两种方式任选其一：
 
-# 部署到 Claude Code skills 目录
-cp SKILL.md ~/.claude/skills/worldcup-analyzer-2026/SKILL.md
-cp -r references ~/.claude/skills/worldcup-analyzer-2026/references/
+### 方式一：让 Agent 直接安装（推荐）
+
+把本仓库链接发给 QoderWork / Qwen Code / Claude Code 等支持 Agent Skills 的助手：
+
 ```
+请安装这个 Skill：https://github.com/realanthonysu/worldcup-analyzer
+```
+
+Agent 会自动将其克隆到技能目录并加载。
+
+### 方式二：使用 npx skills 命令安装
+
+```bash
+npx skills add https://github.com/realanthonysu/worldcup-analyzer --skill worldcup-analyzer
+```
+
+安装完成后刷新 Agent（执行 `/skills` 确认列表中显示 `worldcup-analyzer`）。
 
 ## 使用
 
 ```
 /worldcup-analyzer 法国          # 球队模式
-/worldcup-analyzer 姆巴佩 法国   # 球员模式
-/worldcup-analyzer 姆巴佩        # 单人，自动推断球队
+/worldcup-analyzer 姆巴佩        # 球员模式（自动推断所属球队）
 ```
 
-## 项目结构
-
-```
-SKILL.md              Skill 定义（路由、规则、搜索策略、输出风格）
-references/
-  pre-match.md        赛前五件套模板
-  post-match.md       赛后五件套模板
-  player.md           球员聚焦段模板
-  historical.md       历史模式模板
-tests/
-  scenario-*.md       测试场景（S1-S5）
-  baseline/           RED 阶段基线报告
-  e2e/                GREEN 阶段端到端测试
-ROADMAP.md            优化路线图（v1.3.0 全部完成）
-CHANGELOG.md          版本变更记录
-```
 
 ## 设计原则
 
 - **斜杠命令触发**：不会从自然语言自动激活，必须显式 `/worldcup-analyzer`
+- **搜索降级协议**：每种搜索场景定义有序 query 序列（精准中文 → 精准英文 → 宽泛搜索 → 兜底声明），命中率分层判定
 - **不编造数据**：比分/进球/伤停等必须 web search，无把握时标注"待官方确认"
 - **五件套齐全**：每个模式有固定输出结构，不偷工减料
-- **数据溯源**：关键事实附 Wikipedia/BBC/FIFA/Transfermarkt 链接
+- **数据溯源**：关键事实附 Wikipedia/BBC/FIFA/Transfermarkt 链接，矛盾时选更新时间更近的源并注释分歧
+- **赛事全局边界**：阶段零根据日期自动分流，赛事未开始走前瞻、已结束走总结，不越界
 
 ## 赛事时效
 
-限定 2026 世界杯赛事期间（2026-06-11 ~ 2026-07-19）
+限定 2026 世界杯赛事期间（2026-06-11 ~ 2026-07-19），赛事配置集中在 SKILL.md 顶部配置块，换届时只改一处。
+
+## 版本
+
+当前版本：**v1.4.0**（2026-06-03）。详见 [CHANGELOG.md](CHANGELOG.md)。
+
 ## 许可
 
 MIT

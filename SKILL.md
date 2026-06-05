@@ -3,7 +3,7 @@ name: worldcup-analyzer
 description: Use when user explicitly types `/worldcup-analyzer` followed by a team or player name. Slash command only — does not trigger from natural language mentions of teams or players. Covers pre-match, post-match, historical, and player analysis modes for the 2026 FIFA World Cup.
 user_invocable: true
 disable-model-invocation: true
-version: "1.4.0"
+version: "1.4.1"
 argument-hint: "<队名|球员名>"
 model: inherit
 effort: high
@@ -60,15 +60,30 @@ metadata:
 
 | 当前日期 | 阶段 | 处理方式 |
 |----------|------|----------|
-| < 赛事开始日期（2026-06-11） | 赛事未开始 | → **赛事前瞻模式**，跳过后面的搜索验证，直接进入 [references/pre-match.md](references/pre-match.md) §赛事未开始变体 |
+| < 赛事开始日期（2026-06-11） | 赛事未开始 | → 执行**参赛验证**（见下方），参赛则进入赛事前瞻模式，未参赛则进入历史模式 |
 | 赛事开始日期 ≤ 当前 ≤ 赛事结束日期 | 赛事进行中 | → 进入下方"前置：搜索验证" |
-| > 赛事结束日期（2026-07-19） | 赛事已结束 | → **赛事总结模式**，跳过后面的搜索验证，直接进入 [references/post-match.md](references/post-match.md) §赛事总结变体 |
+| > 赛事结束日期（2026-07-19） | 赛事已结束 | → **赛事总结模式**，跳过搜索验证，直接进入 [references/post-match.md](references/post-match.md) §赛事总结变体 |
 
 > 赛事开始/结束日期引用上方"赛事配置"表，换届时只改配置块即可。
 
+#### 参赛验证（仅"赛事未开始"阶段）
+
+"赛事未开始"阶段需要确认该队是否参加本届世界杯，避免对未参赛球队输出空白前瞻。
+
+```
+query: "$0 2026 世界杯 参赛 分组 大名单"
+query: "$0 2026 FIFA World Cup qualified squad group"
+```
+
+- **搜索确认参赛** → 进入**赛事前瞻模式**，进入 [references/pre-match.md](references/pre-match.md) §赛事未开始变体
+- **搜索确认未参赛** → 进入**历史模式**，进入 [references/historical.md](references/historical.md)：
+  - 该队有世界杯参赛历史（如中国，2002 年参赛）→ 输出历届参赛记录表 + 经典比赛回顾 + 整体履历总结
+  - 该队从未参加过世界杯（如越南）→ 直接说明"该队从未进入过世界杯决赛圈"，简要说明预选赛情况
+- **搜索失败** → 输出"无法确认该队是否参赛，请稍后重试"，不编造数据
+
 ### 前置：搜索验证
 
-> 仅"赛事进行中"阶段执行此步骤。"赛事未开始"和"赛事已结束"跳过此步骤。
+> 仅"赛事进行中"阶段执行此步骤。"赛事未开始"阶段执行上方的"参赛验证"。"赛事已结束"跳过搜索。
 
 进入路由前，先 web search 确认赛程：
 
@@ -180,6 +195,7 @@ query: "$0 2026 FIFA World Cup schedule group"
 - ❌ 多源矛盾时取平均值或模糊范围（应选定一个权威源的具体数字并说明选源理由）
 - ❌ 赛事已结束仍做"下一场对手预测"（应进入赛事总结模式）
 - ❌ 赛事未开始时套用赛前五件套（应进入赛事前瞻模式）
+- ❌ 赛事未开始时对未参赛球队输出空白前瞻（应先做参赛验证，未参赛走历史模式）
 
 ## 输出风格
 

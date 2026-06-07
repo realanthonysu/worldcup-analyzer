@@ -3,7 +3,7 @@ name: worldcup-analyzer
 description: Use when user explicitly types `/worldcup-analyzer` followed by a team, player, or coach name. Slash command only — does not trigger from natural language mentions. Validates input type (rejects clubs, non-football entities, retired/deceased players) and player/coach eligibility before analysis. Covers pre-match, post-match, historical, player, and coach analysis modes for the 2026 FIFA World Cup.
 user_invocable: true
 disable-model-invocation: true
-version: "2.0.0"
+version: "2.0.1"
 argument-hint: "<队名|球员名|教练名>"
 model: inherit
 effort: high
@@ -48,7 +48,7 @@ metadata:
 - ❌ `/worldcup-analyzer 马拉多纳` — **拒收**（已故球员）
 - ❌ `/worldcup-analyzer 中国女足` — **拒收**（女足，本 skill 仅覆盖男子世界杯）
 - ❌ `/worldcup-analyzer 南斯拉夫` — **拒收**（已不存在的国家队）
-- ❌ `/worldcup-analyzer 斯卡洛尼` — **拒收**（教练，非球员）
+- ✅ `/worldcup-analyzer 斯卡洛尼` — 教练模式（→ 教练验证 → [references/coach.md](references/coach.md)）
 - ❌ `/worldcup-analyzer 卡车` — **拒收**（非足球实体）
 - ❌ 普通消息中提到"法国" — **不会**触发
 

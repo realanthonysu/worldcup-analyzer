@@ -118,7 +118,7 @@ npx skills add https://github.com/realanthonysu/worldcup-analyzer --skill worldc
 
 ## 版本
 
-当前版本：**v2.0.0**（2026-06-06）。详见 [CHANGELOG.md](CHANGELOG.md)。
+当前版本：**v2.0.1**（2026-06-07）。详见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 许可
 

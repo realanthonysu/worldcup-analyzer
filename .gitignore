@@ -52,9 +52,9 @@ build/
 dist/
 *.egg
 
-QWEN.md 
+QWEN.md
 CLAUDE.md
-ROADMAP.md 
+docs/ROADMAP.md
 .qwen/
 .claude/
 tests/
